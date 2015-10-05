@@ -13,6 +13,11 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
+CORS_URLS_REGEX = r'^/.*$'
+# CORS_URLS_REGEX = r'^/answers/.*$'
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
@@ -64,6 +69,9 @@ REST_FRAMEWORK = {
 }
 REST_FRAMEWORK = {
     
+}
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
 }
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases

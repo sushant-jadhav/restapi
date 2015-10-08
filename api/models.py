@@ -14,13 +14,14 @@ class Question(models.Model):
  	user_id = models.ForeignKey(User,related_name='user',null=True)
 
 class Answer(models.Model):
- 	ans_text = models.CharField(max_length='1000',null=True)
+ 	ans_text = models.CharField(max_length='10000',null=True)
  	date = models.DateTimeField(null=True)
- 	# u_id = models.ForeignKey(User,related_name='User',null=True)
- 	q_id = models.ForeignKey(Question,related_name='Question',null=True)
- 	user_id = models.ForeignKey(User,related_name='QuestionUser',null=True)
+ 	q_id = models.ForeignKey(Question,related_name='questionid',null=True)
+ 	user_id = models.ForeignKey(User,related_name='questionUser',null=True)
+ 	def __unicode__(self):
+ 		return '%s %s' % (self.date,self.ans_text)
 
-class Like(models.Model):
+class Comment(models.Model):
 	user_id = models.ForeignKey(User,related_name='Answeruser',null=True)
 	ans_id = models.ForeignKey(Answer,related_name='answer',null=True)
-	is_like = models.SmallIntegerField()
+	comment_text = models.CharField(max_length='6000',null=True)

@@ -1,5 +1,5 @@
 # from django.contrib.auth.models import User
-from api.models import Question,User,Answer,Like
+from api.models import Question,User,Answer,Comment
 from rest_framework import serializers
 
 
@@ -7,28 +7,50 @@ class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ('id', 'first_name', 'last_name', 'email','password','about')
-		depth=1
+	def create(self, validated_data):
+		return User(**validated_data)
+
 
 class QuestionSerializer(serializers.ModelSerializer):
-	#question = serializers.HyperlinkedRelatedField(many=True, view_name='question-detail', read_only=True)
+	# user_id = serializers.PrimaryKeyRelatedField(read_only=True,many=True)
  	class Meta:
  		model=Question
  		fields = ('id','title','about','date_create','user_id')
- 		depth=2
- 		def get_related_field(self, model_field):
- 			return QuestionSerializer()
+ 		# depth=1
+ 	def create(self, validated_data):
+ 		return Question(**validated_data)
+
 
 class AnswerSerializer(serializers.ModelSerializer):
-	#question = serializers.HyperlinkedIdentityField( view_name='user-details')
+	qid=QuestionSerializer(many=True,read_only=True)
+	userid = UserSerializer(many=True,read_only=True)
 	class Meta:
 		model= Answer
-		fields = ('id','ans_text','date','q_id','user_id')
-		depth=3
-		def get_related_field(self, model_field):
- 			return AnswerSerializer()
+		fields = ('id','ans_text','date','q_id','user_id','qid','userid')
+		depth=2
+	def create(self, validated_data):
+		que = validated_data.pop('q_id')
+		question = Question.objects.create(**validated_data)
+		Question.objects.create(question=question,**que)
+		return question
+    # def create(self, validated_data):
+    #     tracks_data = validated_data.pop('tracks')
+    #     album = Album.objects.create(**validated_data)
+    #     for track_data in tracks_data:
+    #         Track.objects.create(album=album, **track_data)
+    #     return album
+	# def update(self, instance, validated_data):
+	# 	instance.ans_text=validated_data['ans_text']
+	# 	instance.date=validated_data['date']
+	# 	instance.q_id=validated_data['q_id']
+	# 	instance.user_id=validated_data['user_id']
+	# 	instance.save()
+	# 	return instance
 
-class LikeSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
 	class Meta:
-		model= Like
-		fields = ('id','user_id','ans_id','is_like')
-		depth=3
+		model= Comment
+		fields = ('id','user_id','ans_id','comment_text')
+		# depth=2
+	# def create(self, validated_data):
+	# 	return Comment(**validated_data)

@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'api',
     'drf_multiple_model',
+    'rest_framework_word_filter',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -83,7 +84,11 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+REST_FRAMEWORK = {
+        'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny'
+    , ),
+}
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 

@@ -2,71 +2,100 @@ from django.contrib.auth.models import User
 import django_filters
 from django.http import Http404
 from api.models import Question,User,Answer,Comment
-from api.serializers import UserSerializer,QuestionSerializer,AnswerSerializer,CommentSerializer
+from api.serializers import UserSerializer,QuestionSerializer,QuestionListSerializer,AnswerSerializer,CommentSerializer,AnswerListSerializer,CommentListSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 # from rest_framework import status
 # from api.permissions import IsOwnerOrReadOnly
 from rest_framework import filters
-from rest_framework import generics
-
+from rest_framework import generics,mixins
+from django.http import Http404
+from rest_framework import status
+from rest_framework.response import Response
 
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('id','email','password','image')
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('id','email','password','image')
 
 class QuestionList(generics.ListCreateAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('id',)
+    filter_fields = ('id','user_id','title')
 
 class QuestionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('id',)
+    filter_fields = ('id','user_id','title')
 
+class QuestionlistList(generics.CreateAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionListSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('id','user_id','title')
 
-class AnswerList(generics.ListCreateAPIView):
+class QuestionlistDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionListSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('id','user_id','title')
+
+class AnswerList(generics.CreateAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('q_id','user_id')
-    paginate_by = 10
-    def get_paginate_by(self):
-        """
-        Use smaller pagination for HTML representations.
-        """
-        if self.request.accepted_renderer.format == 'html':
-            return 20
-        return 10
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.queryset)
-    def list(self, request):
-        # Note the use of `get_queryset()` instead of `self.queryset`
-        queryset = self.get_queryset()
-        serializer = AnswerSerializer(queryset, many=True)
-        return Response(serializer.data)
+    filter_fields = ('q_id','user_id','ans_text',)
 
 class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('q_id','user_id')
+    filter_fields = ('q_id','user_id','ans_text',)
+
+class AnswerlistList(generics.ListCreateAPIView):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerListSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('q_id','user_id','ans_text',)
+
+class AnswerlistDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerListSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('q_id','user_id','ans_text',)
 
 class CommentList(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('ans_id','user_id')
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('ans_id','user_id')
 
+class CommentlistList(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentListSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('ans_id','user_id')
+
+class CommentlistDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentListSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('ans_id','user_id')
 # class UserList(APIView):
 #     def get(self, request, format=None):
 #         users = User.objects.all()
